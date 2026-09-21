@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wireline — Application Layer Visualizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <span class="mark">L7</span>
+      <h1>Wireline</h1>
+      <span class="sub">application-layer activity &amp; protocol visualizer</span>
+    </div>
+    <div class="toggle" id="themeToggle" role="group" aria-label="Theme">
+      <button id="btnDark" class="active" aria-pressed="true">Dark</button>
+      <button id="btnLight" aria-pressed="false">Light</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- LEFT: Activity Panel -->
+    <section class="panel">
+      <h2><span class="dot"></span>Activity</h2>
+      <div class="tabs" role="tablist">
+        <button class="tab-btn active" data-act="browse">Browsing</button>
+        <button class="tab-btn" data-act="mail">Mail</button>
+        <button class="tab-btn" data-act="stream">Streaming</button>
+      </div>
+
+      <!-- Browsing form -->
+      <div class="activity-form" id="form-browse">
+        <div class="field">
+          <label for="urlInput">URL</label>
+          <input id="urlInput" type="text" value="www.example.com" placeholder="www.example.com">
+        </div>
+        <div class="actrow" style="margin-top:10px;">
+          <button class="btn" id="btnVisit">Visit page</button>
+        </div>
+      </div>
+
+      <!-- Mail form -->
+      <div class="activity-form" id="form-mail" style="display:none;">
+        <div class="field">
+          <label for="mailTo">To</label>
+          <input id="mailTo" type="text" value="jordan@mailhost.net" placeholder="recipient@domain.com">
+        </div>
+        <div class="field">
+          <label for="mailSubject">Subject</label>
+          <input id="mailSubject" type="text" value="Assignment submission" placeholder="Subject">
+        </div>
+        <div class="field">
+          <label for="mailBody">Body</label>
+          <textarea id="mailBody" rows="3" placeholder="Message body">Hi — attaching the dashboard now.</textarea>
+        </div>
+        <div class="actrow" style="margin-top:6px;">
+          <button class="btn" id="btnSend">Send mail</button>
+        </div>
+      </div>
+
+      <!-- Streaming form -->
+      <div class="activity-form" id="form-stream" style="display:none;">
+        <div class="field">
+          <label>Quality</label>
+          <div class="qualsel" id="qualsel">
+            <button data-q="480p">480p</button>
+            <button data-q="720p" class="active">720p</button>
+            <button data-q="1080p">1080p</button>
+          </div>
+        </div>
+        <div class="actrow" style="margin-top:6px;">
+          <button class="btn" id="btnPlay">▶ Play stream</button>
+          <button class="btn secondary" id="btnPauseStream" disabled>Pause</button>
+        </div>
+      </div>
+
+      <div class="status-badge" id="statusBadge">idle</div>
+
+      <h2 style="margin-top:4px;"><span class="dot"></span>Activity log</h2>
+      <div class="log" id="logBox"><div><span class="t">--:--:--</span>waiting for an action…</div></div>
+    </section>
+
+    <!-- RIGHT: Protocol Visualization Panel -->
+    <section class="panel">
+      <h2><span class="dot"></span>Protocol visualization <span id="protoLabel" style="color:var(--text-faint); font-weight:400;"></span></h2>
+
+      <div class="controls">
+        <button class="iconbtn" id="btnPrev" title="Previous">‹</button>
+        <button class="iconbtn" id="btnPlayPause" title="Play/Pause">▶</button>
+        <button class="iconbtn" id="btnNext" title="Next">›</button>
+        <div class="progress"><div class="bar" id="progBar"></div></div>
+        <span class="stepcount" id="stepCount">0 / 0</span>
+        <button class="iconbtn" id="btnReplay" title="Replay">↺</button>
+      </div>
+
+      <div id="lanesWrap">
+        <div class="lanes">
+          <div class="lane-head client">CLIENT</div>
+          <div class="lane-head mid"></div>
+          <div class="lane-head server">SERVER</div>
+        </div>
+        <div class="msg-track" id="msgTrack">
+          <div class="empty"><b>No activity yet</b>Choose Browsing, Mail, or Streaming on the left and run it — the message exchange will appear here, message by message.</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="foot">DNS · HTTP · SMTP — simulated exchanges for the Application Layer assignment</footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
