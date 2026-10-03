@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Wireline — Application Layer Visualizer</title>
+<title>Wireline — Dual-Panel Activity &amp; Transport-Layer Protocol Visualizer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
@@ -13,9 +13,9 @@
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <span class="mark">L7</span>
+      <span class="mark">L4 / L7</span>
       <h1>Wireline</h1>
-      <span class="sub">application-layer activity &amp; protocol visualizer</span>
+      <span class="sub">dual-panel activity, application &amp; transport-layer visualizer</span>
     </div>
     <div class="toggle" id="themeToggle" role="group" aria-label="Theme">
       <button id="btnDark" class="active" aria-pressed="true">Dark</button>
@@ -66,6 +66,13 @@
       <!-- Streaming form -->
       <div class="activity-form" id="form-stream" style="display:none;">
         <div class="field">
+          <label>Transport Protocol</label>
+          <div class="qualsel" id="protoSel">
+            <button data-proto="tcp" class="active" title="Transmission Control Protocol (HLS segmented streaming)">TCP (HLS / DASH)</button>
+            <button data-proto="udp" title="User Datagram Protocol (Real-time RTP streaming)">UDP (Live RTP)</button>
+          </div>
+        </div>
+        <div class="field" style="margin-top:8px;">
           <label>Quality</label>
           <div class="qualsel" id="qualsel">
             <button data-q="480p">480p</button>
@@ -73,7 +80,7 @@
             <button data-q="1080p">1080p</button>
           </div>
         </div>
-        <div class="actrow" style="margin-top:6px;">
+        <div class="actrow" style="margin-top:10px;">
           <button class="btn" id="btnPlay">▶ Play stream</button>
           <button class="btn secondary" id="btnPauseStream" disabled>Pause</button>
         </div>
@@ -86,32 +93,106 @@
     </section>
 
     <!-- RIGHT: Protocol Visualization Panel -->
-    <section class="panel">
-      <h2><span class="dot"></span>Protocol visualization <span id="protoLabel" style="color:var(--text-faint); font-weight:400;"></span></h2>
-
-      <div class="controls">
-        <button class="iconbtn" id="btnPrev" title="Previous">‹</button>
-        <button class="iconbtn" id="btnPlayPause" title="Play/Pause">▶</button>
-        <button class="iconbtn" id="btnNext" title="Next">›</button>
-        <div class="progress"><div class="bar" id="progBar"></div></div>
-        <span class="stepcount" id="stepCount">0 / 0</span>
-        <button class="iconbtn" id="btnReplay" title="Replay">↺</button>
+    <section class="panel" id="rightPanel">
+      <div class="panel-header-row">
+        <h2><span class="dot"></span>Protocol visualization <span id="protoLabel" style="color:var(--text-faint); font-weight:400;"></span></h2>
+        <!-- View Switcher -->
+        <div class="view-tabs" id="viewTabs" role="tablist">
+          <button class="vtab active" data-view="l4">Transport (L4)</button>
+          <button class="vtab" data-view="l7">Application (L7)</button>
+          <button class="vtab" data-view="split">Split View</button>
+        </div>
       </div>
 
-      <div id="lanesWrap">
-        <div class="lanes">
-          <div class="lane-head client">CLIENT</div>
-          <div class="lane-head mid"></div>
-          <div class="lane-head server">SERVER</div>
+      <!-- State & Congestion Telemetry Bar -->
+      <div class="telemetry-bar" id="telemetryBar">
+        <div class="telemetry-item">
+          <span class="t-label">Client L4 State:</span>
+          <span class="t-val state-pill" id="clientStatePill">CLOSED</span>
         </div>
-        <div class="msg-track" id="msgTrack">
-          <div class="empty"><b>No activity yet</b>Choose Browsing, Mail, or Streaming on the left and run it — the message exchange will appear here, message by message.</div>
+        <div class="telemetry-item">
+          <span class="t-label">Server L4 State:</span>
+          <span class="t-val state-pill" id="serverStatePill">LISTEN</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="t-label">cwnd:</span>
+          <span class="t-val" id="cwndVal">1 MSS</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="t-label">rwnd:</span>
+          <span class="t-val" id="rwndVal">64 KB</span>
+        </div>
+        <div class="telemetry-item full">
+          <span class="t-label">Phase:</span>
+          <span class="t-val" id="activePhase">Ready</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="iconbtn" id="btnPrev" title="Previous packet (‹)">‹</button>
+        <button class="iconbtn" id="btnPlayPause" title="Play/Pause (Space)">▶</button>
+        <button class="iconbtn" id="btnNext" title="Next packet (›)">›</button>
+        <div class="progress"><div class="bar" id="progBar"></div></div>
+        <span class="stepcount" id="stepCount">0 / 0</span>
+        <button class="iconbtn" id="btnReplay" title="Replay (↺)">↺</button>
+        <div class="speed-toggle" id="speedToggle">
+          <button data-speed="1400">1x</button>
+          <button data-speed="850" class="active">1.5x</button>
+          <button data-speed="500">2x</button>
+        </div>
+      </div>
+
+      <!-- Main Visualizer Container -->
+      <div id="lanesContainer" class="view-mode-l4">
+        <!-- L4 Transport Track -->
+        <div class="lane-section" id="l4Section">
+          <div class="section-title">
+            <span>Transport Layer (L4) Sequence Exchange</span>
+            <span class="badge-l4">TCP/UDP Packets</span>
+          </div>
+          <div class="lanes">
+            <div class="lane-head client">CLIENT :52140</div>
+            <div class="lane-head mid">L4 PACKET STREAM</div>
+            <div class="lane-head server">SERVER :PORT</div>
+          </div>
+          <div class="msg-track" id="l4Track">
+            <div class="empty"><b>No activity yet</b>Choose Browsing, Mail, or Streaming on the left and run it — the message exchange will appear here, message by message.</div>
+          </div>
+        </div>
+
+        <!-- L7 Application Track -->
+        <div class="lane-section" id="l7Section">
+          <div class="section-title">
+            <span>Application Layer (L7) Transactions</span>
+            <span class="badge-l7">DNS · HTTP · SMTP</span>
+          </div>
+          <div class="lanes">
+            <div class="lane-head client">CLIENT (APP)</div>
+            <div class="lane-head mid">APPLICATION PAYLOAD</div>
+            <div class="lane-head server">SERVER (DAEMON)</div>
+          </div>
+          <div class="msg-track" id="l7Track">
+            <div class="empty"><b>No activity yet</b>Choose an activity on the left to inspect high-level application messages.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collapsible Packet Inspector -->
+      <div class="packet-inspector" id="packetInspector">
+        <div class="inspector-header">
+          <span class="insp-title">🔍 Packet Header &amp; Logic Inspector</span>
+          <span class="insp-sub" id="inspSub">Click or advance to any packet to inspect RFC fields</span>
+        </div>
+        <div class="inspector-body" id="inspectorBody">
+          <div class="insp-empty">Select a packet from the track to view its full 20-byte TCP / 8-byte UDP header fields and sequence number calculation.</div>
         </div>
       </div>
     </section>
   </div>
 
-  <footer class="foot">DNS · HTTP · SMTP — simulated exchanges for the Application Layer assignment</footer>
+  <footer class="foot">
+    Assignment 2: Dual-Panel Activity &amp; Transport-Layer Protocol Visualizer (TCP / UDP / DNS / HTTP / SMTP)
+  </footer>
 </div>
 
 <script src="script.js"></script>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Assignment 2 Report — Jitul Roy (202402021026)</title>
+<style>
+  @page {
+    size: letter;
+    margin: 0.5in 0.55in 0.5in 0.55in;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1a202c;
+    background: #fff;
+    margin: 0;
+    padding: 0;
+    font-size: 9.5pt;
+    line-height: 1.35;
+  }
+  .header-card {
+    border: 2px solid #0f4c81;
+    border-radius: 6px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-size: 15pt;
+    color: #0f4c81;
+    margin: 0 0 2px 0;
+    font-weight: 700;
+  }
+  .subtitle {
+    font-size: 10.5pt;
+    color: #319795;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+  }
+  .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 14px;
+    font-size: 9pt;
+    border-top: 1px solid #cbd5e0;
+    padding-top: 6px;
+  }
+  .meta-grid div span.lbl {
+    font-weight: 700;
+    color: #2d3748;
+  }
+  a {
+    color: #0d6efd;
+    text-decoration: underline;
+    font-weight: 600;
+  }
+  h2 {
+    font-size: 11pt;
+    color: #0f4c81;
+    margin: 10px 0 4px 0;
+    border-bottom: 1.5px solid #e2e8f0;
+    padding-bottom: 2px;
+    font-weight: 700;
+  }
+  p {
+    margin: 0 0 5px 0;
+    text-align: justify;
+  }
+  ul {
+    margin: 2px 0 6px 16px;
+    padding: 0;
+  }
+  li {
+    margin-bottom: 3px;
+  }
+  li strong {
+    color: #2b6cb0;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8pt;
+    margin: 6px 0 8px 0;
+  }
+  th, td {
+    border: 1px solid #cbd5e0;
+    padding: 4px 6px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background-color: #0f4c81;
+    color: #ffffff;
+    font-weight: 600;
+  }
+  tr:nth-child(even) td {
+    background-color: #f7fafc;
+  }
+  .badge {
+    display: inline-block;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 7.5pt;
+    font-weight: 700;
+    background: #e2e8f0;
+    color: #2d3748;
+  }
+  .badge-tcp { background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; }
+  .badge-udp { background: #faf5ff; color: #6b46c1; border: 1px solid #e9d8fd; }
+  .footer-bar {
+    font-size: 8pt;
+    color: #718096;
+    text-align: center;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 5px;
+    margin-top: 10px;
+  }
+  .page-break {
+    page-break-before: always;
+  }
+</style>
+</head>
+<body>
+
+<div class="header-card">
+  <h1>Computer Networks — Transport Layer (Assignment 2)</h1>
+  <div class="subtitle">Dual-Panel Activity &amp; Transport-Layer Protocol Visualizer (L4 / L7 Extension)</div>
+  <div class="meta-grid">
+    <div><span class="lbl">Author / Student:</span> <span>Jitul Roy</span></div>
+    <div><span class="lbl">Roll Number:</span> <span>202402021026</span></div>
+    <div><span class="lbl">Live Working Demo:</span> <a href="https://application-layer-six.vercel.app/" target="_blank">https://application-layer-six.vercel.app/</a></div>
+    <div><span class="lbl">GitHub Repository:</span> <a href="https://github.com/zitulroy/Application-layer" target="_blank">https://github.com/zitulroy/Application-layer</a></div>
+    <div><span class="lbl">AI Platform &amp; Model:</span> <span>Google Antigravity &bull; Gemini 3.8 Flash (High Reasoning)</span></div>
+    <div><span class="lbl">Prerequisite:</span> <span>Working Assignment 1 (Application Layer Dashboard)</span></div>
+  </div>
+</div>
+
+<h2>1. Summary of Changes Made in This Session</h2>
+<p>
+  During this session, the existing Assignment 1 Application Layer dashboard was systematically upgraded into a dual-panel Transport &amp; Application Layer protocol visualizer meeting all Assignment 2 requirements:
+</p>
+<ul>
+  <li><strong>Dual-View &amp; Split-View Visualizer:</strong> Extended the right panel to support three view modes toggled via an interactive tab bar: <em>Transport Layer (L4)</em>, <em>Application Layer (L7)</em>, and <em>Split View (L7 + L4)</em> which displays both layers simultaneously in lockstep.</li>
+  <li><strong>Complete RFC 793 / RFC 9293 Transport Simulation:</strong> Built an accurate protocol state engine simulating TCP 3-way handshakes (<code>SYN</code> &rarr; <code>SYN-ACK</code> &rarr; <code>ACK</code>), data segments with flags (<code>[PSH, ACK]</code>), cumulative acknowledgments, and graceful 4-way connection teardowns (<code>[FIN, ACK]</code>).</li>
+  <li><strong>Interactive Packet Header &amp; Logic Inspector:</strong> Implemented a 32-bit TCP / 8-byte UDP header inspector box displaying RFC bitfield structures (Source/Destination Ports, Seq #, Ack #, Data Offset, Flags, Window Size, Checksum) and plain-English byte-accounting calculations.</li>
+  <li><strong>Real-Time Connection Telemetry:</strong> Added a live telemetry bar displaying Client/Server TCP states (<code>SYN_SENT</code>, <code>ESTABLISHED</code>, <code>FIN_WAIT_1</code>, <code>TIME_WAIT</code>, <code>CLOSED</code>), Congestion Window (<code>cwnd</code>), and Receiver Window (<code>rwnd</code>).</li>
+  <li><strong>Streaming Protocol Comparison (Extra Credit):</strong> Added an interactive toggle between <strong>TCP (HLS / DASH)</strong> segmented streaming and <strong>UDP (Live RTP)</strong> datagram delivery to demonstrate reliable byte-stream delivery versus low-latency, connectionless transmission.</li>
+  <li><strong>Automated Testing &amp; Deep-Linking:</strong> Added URL query parameter support (<code>?act=...&amp;step=...&amp;view=...&amp;proto=...</code>) allowing direct linking and headless test capture. Verified layout with high-resolution screenshot captures in <code>screenshots/</code>.</li>
+  <li><strong>Submission Deliverables:</strong> Generated reflection documentation in Markdown (<code>REFLECTION.md</code>), Word (<code>reflection_document.docx</code>), and print-ready PDF (<code>reflection_document.pdf</code>).</li>
+</ul>
+
+<h2>2. Dual-Panel Synchronization Architecture</h2>
+<p>
+  The architecture links the left activity panel with the dual visualization tracks in the right panel through a single coordinated state engine:
+</p>
+<ul>
+  <li><strong>Hierarchical Data Binding:</strong> Every L4 transport packet (TCP/UDP) stores an explicit pointer (<code>l7Index</code>) referencing its parent L7 transaction (DNS query, HTTP request/response, SMTP envelope command, or media segment).</li>
+  <li><strong>Unified Timeline Clock:</strong> A master cursor coordinates both tracks. When stepping or auto-playing, packet <code>i</code> highlights on the L4 sequence diagram while simultaneously pulsing transaction <code>pkt[i].l7Index</code> on the L7 track.</li>
+  <li><strong>Comprehensive Controls:</strong> Users can Play/Pause (Spacebar), Step Forward (<code>›</code> / Right Arrow), Step Backward (<code>‹</code> / Left Arrow), Replay (<code>↺</code>), and adjust simulation speed (1x, 1.5x, 2x).</li>
+</ul>
+
+<h2>3. What the AI Got Wrong &amp; How It Was Corrected</h2>
+<p>
+  AI-assisted code generation initially produced subtle protocol bugs that required manual intervention and RFC verification:
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 24%;">Error Category</th>
+      <th style="width: 38%;">AI Initial Output</th>
+      <th style="width: 38%;">RFC Standard &amp; Applied Correction</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>SYN / FIN Sequence Space</strong></td>
+      <td>Treated SYN and FIN as consuming 0 sequence bytes because their payload <code>Length = 0</code>, causing HTTP GET to erroneously reuse <code>Seq = 1000</code>.</td>
+      <td><strong>RFC 793 / 9293 Rule:</strong> SYN and FIN each consume exactly <strong>1 byte of sequence space</strong>. Corrected sequence logic: <code>cSeq += 1</code> on SYN/FIN. HTTP GET correctly starts at <code>Seq = 1001</code> and the peer returns <code>Ack = 1001</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Cumulative ACK Calculation</strong></td>
+      <td>Set ACK numbers equal to the received segment's sequence number (<code>Ack = Seq</code>), confusing acknowledgment with echo.</td>
+      <td><strong>RFC 9293 Standard:</strong> An ACK number specifies the <em>next expected byte</em> (<code>Ack = Seq + Length</code>). Corrected: 185-byte HTTP GET at Seq 1001 triggers Server <code>Ack = 1001 + 185 = 1186</code>. Pure ACKs (<code>Len = 0</code>) do not advance sequence space.</td>
+    </tr>
+    <tr>
+      <td><strong>TCP Connection Teardown</strong></td>
+      <td>Generated an abrupt 2-packet close (Client FIN &rarr; Server ACK), leaving half-open connections without a server FIN.</td>
+      <td><strong>Full 4-Way Teardown:</strong> Modeled full bidirectional close: Client FIN, ACK (<code>FIN_WAIT_1</code>) &rarr; Server ACK (<code>CLOSE_WAIT</code> &rarr; <code>FIN_WAIT_2</code>) &rarr; Server FIN, ACK (<code>LAST_ACK</code> &rarr; <code>TIME_WAIT</code>) &rarr; Client Final ACK (<code>CLOSED</code> after 2MSL).</td>
+    </tr>
+    <tr>
+      <td><strong>Streaming Protocol Modeling</strong></td>
+      <td>Assumed video streaming must be strictly TCP HLS, omitting the datagram delivery comparison highlighted in the assignment prompt.</td>
+      <td><strong>TCP vs. UDP Toggle:</strong> Added an interactive transport protocol selector enabling real-time comparison between TCP segmented byte-stream transfer and UDP stateless RTP datagram streaming.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. Key Differences Observed Across Transport-Layer Flows</h2>
+<ul>
+  <li><strong>Web Browsing (HTTP/1.1 over TCP):</strong> Short-lived request-response lifecycle. Handshake (3 packets) and teardown (4 packets) account for ~50% of the exchange. Asymmetric payload (small ~185 B HTTP request vs multi-packet HTML response). Socket closes gracefully after page load.</li>
+  <li><strong>Mail Delivery (SMTP over TCP):</strong> Conversational, lockstep protocol. The server speaks first with a <code>220</code> banner, followed by serialized command-response pairs (<code>EHLO</code> &rarr; <code>250</code>, <code>MAIL FROM</code> &rarr; <code>250</code>, <code>RCPT TO</code> &rarr; <code>250</code>, <code>DATA</code> &rarr; <code>354</code>, body &rarr; <code>250</code>, <code>QUIT</code> &rarr; <code>221</code>). Messages use <code>[PSH, ACK]</code> for immediate application delivery, making SMTP highly sensitive to latency and Round-Trip Time (RTT).</li>
+  <li><strong>Media Streaming (HLS over TCP vs. UDP RTP):</strong> TCP streaming showcases <em>persistent connection reuse</em> (HTTP Keep-Alive), requesting media segments (<code>seg000.ts</code>, <code>seg001.ts</code>) over an established socket without repeated handshakes, while Congestion Window (<code>cwnd</code>) ramps up via Slow Start (1 &rarr; 2 &rarr; 4 &rarr; 8 &rarr; 16 MSS). In contrast, the UDP RTP option illustrates zero-RTT startup, stateless 8-byte header datagrams, and zero head-of-line blocking, prioritizing immediate playback over lossless delivery.</li>
+</ul>
+
+<h2>5. AI Platform &amp; Model Selection Rationale</h2>
+<p>
+  <strong>Google Antigravity</strong> with <strong>Gemini 3.8 Flash (High Reasoning)</strong> was chosen because it allows direct in-workspace editing and testing without external copy-pasting. Its strong protocol reasoning ensured RFC mathematical accuracy, while integrated command execution enabled automated screenshot generation and code verification.
+</p>
+
+<div class="footer-bar">
+  <strong>Assignment 2 Submission:</strong> Jitul Roy (Roll: 202402021026) &bull; Live Demo: <a href="https://application-layer-six.vercel.app/" target="_blank">https://application-layer-six.vercel.app/</a> &bull; GitHub: <a href="https://github.com/zitulroy/Application-layer" target="_blank">https://github.com/zitulroy/Application-layer</a>
+</div>
+
+</body>
+</html>
